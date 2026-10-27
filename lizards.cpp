@@ -25,6 +25,7 @@
 #include <thread>
 #include <mutex>
 #include <vector>
+#include <memory>
 
 
 using namespace std;
@@ -647,9 +648,9 @@ int main(int argc, char **argv)
 	/*
 	 * Create NUM_LIZARDS lizard threads
 	 */
-	vector<Lizard*> allLizards;
-	for (int i=0; i < NUM_LIZARDS; i++) {
-		allLizards.push_back(new Lizard(i));
+	vector<std::unique_ptr<Lizard>> allLizards;
+	for (size_t i = 0; i < NUM_LIZARDS; i++) {
+		allLizards.emplace_back(new Lizard(i));
 	}    
     
 
@@ -661,8 +662,8 @@ int main(int argc, char **argv)
 	/*
 	 * Run NUM_LIZARDS and NUM_CATS threads
 	 */
-	for (int i=0; i < NUM_LIZARDS; i++) {
-		allLizards[i]->run();
+	for (int i = 0; i < NUM_LIZARDS; i++) {
+		allLizards.at(i)->run();
 	}
 
 	/*
