@@ -5,9 +5,10 @@
  *
  * @param id - the Id of the lizard 
  */
-Lizard::Lizard (int id)
+Lizard::Lizard(int id, bool debug)
 {
 	_id = id;
+	isdebug = debug;
 }
 
 /**

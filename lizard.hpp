@@ -5,12 +5,13 @@ class Lizard {
 	thread* _aLizard; // the thread simulating the lizard
 
 	public:
-		Lizard(int id);
+		Lizard(int id, bool debug);
 		int getId();
         void run();
         void wait();
 
     private:
+		bool isdebug;
 		void sago2MonkeyGrassIsSafe();
 		void crossSago2MonkeyGrass();
 		void madeIt2MonkeyGrass();

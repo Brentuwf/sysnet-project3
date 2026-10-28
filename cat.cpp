@@ -6,9 +6,10 @@
  *
  * @param id - the Id of the cat 
  */
-Cat::Cat (int id)
+Cat::Cat (int id, bool debug)
 {
 	_id = id;
+	isdebug = debug;
 }
 
 /**
