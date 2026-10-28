@@ -23,8 +23,10 @@
 #include <thread>
 #include <mutex>
 #include <vector>
+#include <atomic>
 #include <memory>
 
+#include "SharedState.hpp"
 #include "lizard.hpp"
 #include "cat.hpp"
 
@@ -72,19 +74,6 @@ static constexpr size_t MAX_CAT_SLEEP = 3;
  * Declare global variables here
  */
 
-
-/**************************************************/
-/* Please leave these variables alone.  They are  */
-/* used to check the proper functioning of your   */
-/* program.  They should only be used in the code */
-/* I have provided.                               */
-/**************************************************/
-size_t numCrossingSago2MonkeyGrass;
-size_t numCrossingMonkeyGrass2Sago;
-bool debug;
-bool running;
-/**************************************************/
-
 /*
  * main()
  *
@@ -95,6 +84,7 @@ bool running;
  */
 int main(int argc, char **argv)
 {
+	SharedState sharedState;
 	/*
 	 * Declare local variables
 	 */
@@ -105,18 +95,18 @@ int main(int argc, char **argv)
 	/*
 	 * Check for the debugging flag (-d)
 	 */
-	debug = false;
+	sharedState.debug.store(false);
 	if (argc > 1)
 		if (strncmp(argv[1], "-d", 2) == 0)
-			debug = true;
+			sharedState.debug.store(true);
 
 
 	/*
 	 * Initialize variables
 	 */
-	numCrossingSago2MonkeyGrass = 0;
-	numCrossingMonkeyGrass2Sago = 0;
-	running = true;
+	sharedState.numCrossingSago2MonkeyGrass.store(0);
+	sharedState.numCrossingMonkeyGrass2Sago.store(0);
+	sharedState.running.store(true);
 
 
 	/*
