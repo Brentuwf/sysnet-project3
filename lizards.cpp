@@ -14,8 +14,6 @@
 /*                                                             */
 /***************************************************************/
 
-#include <iostream>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -27,9 +25,8 @@
 #include <vector>
 #include <memory>
 
+#include "lizard.hpp"
 #include "cat.hpp"
-
-using namespace std;
 
 /*
  * This is a stub file.  It contains very little code and what
@@ -43,13 +40,6 @@ using namespace std;
 /*
  * Define "constant" values here
  */
-
-/*
- * Make this 1 to check for lizards travelling in both directions
- * Leave it 0 to allow bidirectional travel
- */
-static constexpr bool UNIDIRECTIONAL = 0;
-
 /*
  * Set this to the number of seconds you want the lizard world to
  * be simulated.  
@@ -73,24 +63,9 @@ static constexpr size_t NUM_CATS = 2;
 static constexpr size_t MAX_LIZARD_CROSSING = 4;
 
 /*
- * Maximum seconds for a lizard to sleep
- */
-static constexpr size_t MAX_LIZARD_SLEEP = 3;
-
-/*
  * Maximum seconds for a cat to sleep
  */
 static constexpr size_t MAX_CAT_SLEEP = 3;
-
-/*
- * Maximum seconds for a lizard to eat
- */
-static constexpr size_t MAX_LIZARD_EAT = 5;
-
-/*
- * Number of seconds it takes to cross the driveway
- */
-static constexpr size_t CROSS_SECONDS = 2
 
 
 /*
@@ -104,10 +79,10 @@ static constexpr size_t CROSS_SECONDS = 2
 /* program.  They should only be used in the code */
 /* I have provided.                               */
 /**************************************************/
-int numCrossingSago2MonkeyGrass;
-int numCrossingMonkeyGrass2Sago;
-int debug;
-int running;
+size_t numCrossingSago2MonkeyGrass;
+size_t numCrossingMonkeyGrass2Sago;
+bool debug;
+bool running;
 /**************************************************/
 
 /*
@@ -130,10 +105,10 @@ int main(int argc, char **argv)
 	/*
 	 * Check for the debugging flag (-d)
 	 */
-	debug = 0;
+	debug = false;
 	if (argc > 1)
 		if (strncmp(argv[1], "-d", 2) == 0)
-			debug = 1;
+			debug = true;
 
 
 	/*
@@ -141,13 +116,13 @@ int main(int argc, char **argv)
 	 */
 	numCrossingSago2MonkeyGrass = 0;
 	numCrossingMonkeyGrass2Sago = 0;
-	running = 1;
+	running = true;
 
 
 	/*
 	 * Initialize random number generator
 	 */
-	srandom( (unsigned int)time(NULL) );
+	srandom((unsigned int)time(NULL));
 
 
 	/*
@@ -160,17 +135,17 @@ int main(int argc, char **argv)
 	/*
 	 * Create NUM_LIZARDS lizard threads
 	 */
-	vector<std::unique_ptr<Lizard>> allLizards;
+	std::vector<std::unique_ptr<Lizard>> allLizards;
 	for (size_t i = 0; i < NUM_LIZARDS; ++i) 
-		allLizards.emplace_back(new Lizard(i));
+		allLizards.emplace_back(new Lizard(i, debug));
     
 
 	/*
 	 * Create NUM_CATS cat threads
 	 */
-	vector<std::unique_ptr<Cat>> allCats;
+	std::vector<std::unique_ptr<Cat>> allCats;
 	for (size_t i = 0; i < NUM_CATS; ++i) 
-		allCats.emplace_back(new Cat(i));
+		allCats.emplace_back(new Cat(i, debug));
 	
 	 
 
@@ -178,7 +153,7 @@ int main(int argc, char **argv)
 	 * Run NUM_LIZARDS and NUM_CATS threads
 	 */
 	for (size_t i = 0; i < NUM_LIZARDS; ++i) 
-		allLizards.at(i)->run();
+		allLizards.at(i)->run(running);
 
 	for (size_t i = 0; i < NUM_CATS; ++i) 
 		allCats.at(i)->run();
@@ -186,7 +161,7 @@ int main(int argc, char **argv)
 	/*
 	 * Now let the world run for a while
 	 */
-	sleep( WORLDEND );
+	sleep(WORLDEND);
 
 
 	/*
@@ -226,5 +201,5 @@ int main(int argc, char **argv)
 	/*
 	 * Exit happily
 	 */
-	return 0;
+	return EXIT_SUCCESS;
 }
