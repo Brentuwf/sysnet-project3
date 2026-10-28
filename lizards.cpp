@@ -26,7 +26,7 @@
 #include <atomic>
 #include <memory>
 
-#include "SharedState.hpp"
+#include "sharedstate.hpp"
 #include "lizard.hpp"
 #include "cat.hpp"
 
@@ -127,7 +127,7 @@ int main(int argc, char **argv)
 	 */
 	std::vector<std::unique_ptr<Lizard>> allLizards;
 	for (size_t i = 0; i < NUM_LIZARDS; ++i) 
-		allLizards.emplace_back(new Lizard(i, debug));
+		allLizards.emplace_back(new Lizard(i));
     
 
 	/*
@@ -135,7 +135,7 @@ int main(int argc, char **argv)
 	 */
 	std::vector<std::unique_ptr<Cat>> allCats;
 	for (size_t i = 0; i < NUM_CATS; ++i) 
-		allCats.emplace_back(new Cat(i, debug));
+		allCats.emplace_back(new Cat(i));
 	
 	 
 
@@ -143,7 +143,7 @@ int main(int argc, char **argv)
 	 * Run NUM_LIZARDS and NUM_CATS threads
 	 */
 	for (size_t i = 0; i < NUM_LIZARDS; ++i) 
-		allLizards.at(i)->run(running);
+		allLizards.at(i)->run(sharedState);
 
 	for (size_t i = 0; i < NUM_CATS; ++i) 
 		allCats.at(i)->run();
@@ -157,8 +157,7 @@ int main(int argc, char **argv)
 	/*
 	 * That's it - the end of the world
 	 */
-	running = 0;
-
+	sharedState.running.store(0);
 
 	/*
 	 * Wait until all threads terminate

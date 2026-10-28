@@ -1,17 +1,17 @@
 #include <unistd.h>
-#include <thread>
 #include <iostream>
+#include <functional>
+#include <thread>
+#include "sharedstate.hpp"
 #include "lizard.hpp"
+
 
 /**
  * Constructs a lizard.
  *
  * @param id - the Id of the lizard 
  */
-Lizard::Lizard(int id, bool &debug) : debug(debug)
-{
-	_id = id;
-}
+Lizard::Lizard(int id) { _id = id; }
 
 /**
  * Returns the Id of the lizard.
@@ -20,20 +20,17 @@ Lizard::Lizard(int id, bool &debug) : debug(debug)
  * 
  * Status: Complete - No need to change any of this code
  */
-int Lizard::getId()
-{
-	return _id;
-}
+int Lizard::getId() { return _id; }
 
 /**
  * Launches a lizard thread.
  * 
  * Status: Complete - No need to change any of this code.
  */
- void Lizard::run(bool &running) 
+ void Lizard::run(SharedState& state) 
  {
 	 // launch the thread to simulate the lizard's behavior
-	_aLizard = new std::thread (lizardThread, this, std::ref(running)); 
+	_aLizard = new std::thread(lizardThread, this, std::ref(state)); 
  }
  
  /**
@@ -44,7 +41,7 @@ int Lizard::getId()
  void Lizard::wait()
  {
 	 // wait for the thread to terminate
-	if (_aLizard != NULL) {
+	if (_aLizard != nullptr) {
         _aLizard->join();
     } 
  }
@@ -55,20 +52,18 @@ int Lizard::getId()
  *
  * Status: Complete - No need to change any of this code.
  */
-void Lizard::sleepNow()
+void Lizard::sleepNow(std::atomic<bool> &debug)
 {
-	int sleepSeconds;
+	int sleepSeconds = 1 + (int)(random() / (double)RAND_MAX * MAX_LIZARD_SLEEP);
 
-	sleepSeconds = 1 + (int)(random() / (double)RAND_MAX * MAX_LIZARD_SLEEP);
-
-	if (debug) {
+	if (debug.load()) {
 		std::cout << "[" << _id << "] sleeping for " << sleepSeconds << " seconds" << std::endl;
 		std::cout << std::flush;
 	}
 
-	sleep( sleepSeconds );
+	sleep(sleepSeconds);
 
-	if (debug) {
+	if (debug.load()) {
 		std::cout << "[" << _id << "] awake" << std::endl;
 		std::cout << std::flush;
 	}
@@ -85,9 +80,9 @@ void Lizard::sleepNow()
  *
  * Status: Incomplete - Make changes as you see are necessary.
  */
-void Lizard::sago2MonkeyGrassIsSafe()
+void Lizard::sago2MonkeyGrassIsSafe(SharedState &state)
 {
-	if (debug) {
+	if (state.debug.load()) {
 		std::cout << "[" << _id << "] checking  sago -> monkey grass" << std::endl;
 		std::cout << std::flush;
     	}
@@ -95,7 +90,7 @@ void Lizard::sago2MonkeyGrassIsSafe()
 	
 
 
-	if (debug) {
+	if (state.debug.load()) {
 		std::cout << "[" << _id << "] thinks  sago -> monkey grass  is safe" << std::endl;
 		std::cout << std::flush;
     	}
@@ -109,9 +104,9 @@ void Lizard::sago2MonkeyGrassIsSafe()
  *
  * Status: Incomplete - Make changes as you see are necessary.
  */
-void Lizard::crossSago2MonkeyGrass()
+void Lizard::crossSago2MonkeyGrass(SharedState &state)
 {
-	if (debug) {
+	if (state.debug.load()) {
 		std::cout << "[" << _id << "] crossing  sago -> monkey grass" << std::endl;
 		std::cout << std::flush;
 	}
@@ -119,15 +114,15 @@ void Lizard::crossSago2MonkeyGrass()
 	/*
 	 * One more crossing this way
 	 */
-	numCrossingSago2MonkeyGrass++;
+	state.numCrossingSago2MonkeyGrass++;
 
 	/*
 	 * Check for lizards cross both ways
 	 */
-	if (numCrossingMonkeyGrass2Sago && UNIDIRECTIONAL) {
+	if (state.numCrossingMonkeyGrass2Sago.load() && UNIDIRECTIONAL) {
 		std::cout << "\tCrash!  We have a pile-up on the concrete." << std::endl;
-		std::cout << "\t" << numCrossingSago2MonkeyGrass << " crossing sago -> monkey grass" << std::endl;
-		std::cout << "\t" << numCrossingMonkeyGrass2Sago << " crossing monkey grass -> sago" << std::endl;
+		std::cout << "\t" << state.numCrossingSago2MonkeyGrass.load() << " crossing sago -> monkey grass" << std::endl;
+		std::cout << "\t" << state.numCrossingMonkeyGrass2Sago.load() << " crossing monkey grass -> sago" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -140,7 +135,7 @@ void Lizard::crossSago2MonkeyGrass()
 	/*
 	 * That one seems to have made it
 	 */
-	numCrossingSago2MonkeyGrass--;
+	state.numCrossingSago2MonkeyGrass--;
 }
 
 
@@ -149,12 +144,12 @@ void Lizard::crossSago2MonkeyGrass()
  *
  * Status: Incomplete - Make changes as you see are necessary.
  */
-void Lizard::madeIt2MonkeyGrass()
+void Lizard::madeIt2MonkeyGrass(SharedState &state)
 {
 	/*
 	* Whew, made it across
 	*/
-	if (debug) {
+	if (state.debug.load()) {
 		std::cout << "[" << _id << "] made the  sago -> monkey grass  crossing" << std::endl;
 		std::cout << std::flush;
 	}
@@ -171,13 +166,11 @@ void Lizard::madeIt2MonkeyGrass()
  *
  * Status: Complete - No need to change any of this code.
  */
-void Lizard::eat()
+void Lizard::eat(std::atomic<bool> &debug)
 {
-	int eatSeconds;
+	int eatSeconds = 1 + (int)(random() / (double)RAND_MAX * MAX_LIZARD_EAT);
 
-	eatSeconds = 1 + (int)(random() / (double)RAND_MAX * MAX_LIZARD_EAT);
-
-	if (debug) {
+	if (debug.load()) {
 		std::cout << "[" << _id << "] eating for " << eatSeconds << " seconds" << std::endl;
 		std::cout << std::flush;
 	}
@@ -187,7 +180,7 @@ void Lizard::eat()
 	 */
 	sleep(eatSeconds);
 
-	if (debug) {
+	if (debug.load()) {
 		std::cout << "[" << _id << "] finished eating" << std::endl;
 		std::cout << std::flush;
 	}
@@ -201,9 +194,9 @@ void Lizard::eat()
  *
  * Status: Incomplete - Make changes as you see are necessary.
  */
-void Lizard::monkeyGrass2SagoIsSafe()
+void Lizard::monkeyGrass2SagoIsSafe(SharedState &state)
 {
-	if (debug) {
+	if (state.debug.load()) {
 		std::cout << "[" << _id << "] checking  monkey grass -> sago" << std::endl;
 		std::cout << std::flush;
 	}
@@ -212,7 +205,7 @@ void Lizard::monkeyGrass2SagoIsSafe()
 
 
 
-	if (debug) {
+	if (state.debug.load()) {
 		std::cout << "[" << _id << "] thinks  monkey grass -> sago  is safe" << std::endl;
 		std::cout << std::flush;
 	}
@@ -226,9 +219,9 @@ void Lizard::monkeyGrass2SagoIsSafe()
  *
  * Status: Incomplete - Make changes as you see are necessary.
  */
-void Lizard::crossMonkeyGrass2Sago()
+void Lizard::crossMonkeyGrass2Sago(SharedState &state)
 {
-	if (debug) {
+	if (state.debug.load()) {
 		std::cout << "[" << _id << "] crossing  monkey grass -> sago" << std::endl;
 		std::cout << std::flush;
 	}
@@ -236,16 +229,16 @@ void Lizard::crossMonkeyGrass2Sago()
 	/*
 	 * One more crossing this way
 	 */
-	numCrossingMonkeyGrass2Sago++;
+	state.numCrossingMonkeyGrass2Sago++;
 
   
 	/*
 	 * Check for lizards cross both ways
 	 */
-	if (numCrossingSago2MonkeyGrass && UNIDIRECTIONAL) {
+	if (state.numCrossingSago2MonkeyGrass.load() && UNIDIRECTIONAL) {
 		std::cout << "\tOh No!, the lizards have cats all over them." << std::endl;
-		std::cout << "\t " << numCrossingSago2MonkeyGrass << " crossing sago -> monkey grass" << std::endl;
-		std::cout << "\t " << numCrossingMonkeyGrass2Sago << " crossing monkey grass -> sago" << std::endl;
+		std::cout << "\t " << state.numCrossingSago2MonkeyGrass.load() << " crossing sago -> monkey grass" << std::endl;
+		std::cout << "\t " << state.numCrossingMonkeyGrass2Sago.load() << " crossing monkey grass -> sago" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -257,7 +250,7 @@ void Lizard::crossMonkeyGrass2Sago()
 	/*
 	 * That one seems to have made it
 	 */
-	numCrossingMonkeyGrass2Sago--;
+	state.numCrossingMonkeyGrass2Sago--;
 }
 
 
@@ -267,12 +260,12 @@ void Lizard::crossMonkeyGrass2Sago()
  *
  * Status: Incomplete - Make changes as you see are necessary.
  */
-void Lizard::madeIt2Sago()
+void Lizard::madeIt2Sago(SharedState &state)
 {
 	/*
 	 * Whew, made it across
 	 */
-	if (debug) {
+	if (state.debug.load()) {
 		std::cout << "[" << _id << "] made the  monkey grass -> sago  crossing" << std::endl;
 		std::cout << std::flush;
 	}
@@ -285,18 +278,16 @@ void Lizard::madeIt2Sago()
   *  
   * @param aLizard - the lizard to be executed concurrently
   *
-  * @return N/A
-  
   * Status: Incomplete - Make changes as you see are necessary.
   */
-void Lizard::lizardThread(Lizard *aLizard, bool &running)
+void Lizard::lizardThread(Lizard *aLizard, SharedState& state)
 {	
-	if (aLizard->debug) {
+	if (state.debug.load()) {
 		std::cout << "[" << aLizard->getId() << "] lizard is alive" << std::endl;
 		std::cout << std::flush;
 	}
 
-	while(running) {
+	while(state.running.load()) {
 	/* 
 	 * Follow the algorithm given in the assignment
 	 * using calls to the functions declared above.

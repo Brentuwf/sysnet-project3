@@ -1,11 +1,12 @@
 #pragma once
 #include <thread>
+#include "sharedstate.hpp"
 
 class Lizard {
 	public:
-		Lizard(int id, bool &debug);
+		Lizard(int id);
 		int getId();
-		void run(bool &running);
+		void run(SharedState &state);
 		void wait();
 
 	private:
@@ -19,16 +20,14 @@ class Lizard {
 		static constexpr bool UNIDIRECTIONAL = 0;
 		int     _id;      // the Id of the lizard
 		std::thread* _aLizard; // the thread simulating the lizard
-		bool &debug;
-		void sago2MonkeyGrassIsSafe();
-		void crossSago2MonkeyGrass();
-		void madeIt2MonkeyGrass();
-		void eat();
-		void monkeyGrass2SagoIsSafe();
-		void crossMonkeyGrass2Sago();
-		void madeIt2Sago();
-		void sleepNow();
-		static void lizardThread(Lizard *aLizard, bool &running);
-	
+		void sago2MonkeyGrassIsSafe(SharedState &state);
+		void crossSago2MonkeyGrass(SharedState &state);
+		void madeIt2MonkeyGrass(SharedState &state);
+		void eat(std::atomic<bool> &debug);
+		void monkeyGrass2SagoIsSafe(SharedState &state);
+		void crossMonkeyGrass2Sago(SharedState &state);
+		void madeIt2Sago(SharedState &state);
+		void sleepNow(std::atomic<bool> &debug);
+		static void lizardThread(Lizard *aLizard, SharedState& state);
 };
 
