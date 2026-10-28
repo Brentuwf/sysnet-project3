@@ -1,4 +1,7 @@
+#include <unistd.h>
+#include <iostream>
 #include <thread>
+#include "sharedstate.hpp"
 #include "cat.hpp"
 
 /**
@@ -6,29 +9,21 @@
  *
  * @param id - the Id of the cat 
  */
-Cat::Cat (int id, bool debug)
-{
-	_id = id;
-	isdebug = debug;
-}
+Cat::Cat (int id) { _id = id; }
 
 /**
  * Returns the Id of the cat.
  *
  * @return the Id of a cat
  */
-int Cat::getId()
-{
-	return _id;
-}
-
+int Cat::getId() { return _id; }
 
 /**
  * Launches a cat thread.
  * 
  * Status: Incomplete - Make changes to this code.
  */
- void Cat::run() 
+ void Cat::run(SharedState &state) 
  {
 	 // launch the thread to simulate the cat's behavior	 
 	 
@@ -53,25 +48,21 @@ int Cat::getId()
  *
  * Status: Complete - No need to change any of this code.
  */
-void Cat::sleepNow()
+void Cat::sleepNow(std::atomic<bool> &debug)
 {
-	int sleepSeconds;
+	int sleepSeconds = 1 + (int)(random() / (double)RAND_MAX * MAX_CAT_SLEEP);
 
-	sleepSeconds = 1 + (int)(random() / (double)RAND_MAX * MAX_CAT_SLEEP);
+	if (debug.load()) {
+		std::cout << "[" << _id << "] cat sleeping for " << sleepSeconds << " seconds" << std::endl;
+		std::cout << std::flush;
+	}
 
-	if (debug)
-    {
-		cout << "[" << _id << "] cat sleeping for " << sleepSeconds << " seconds" << endl;
-		cout << flush;
-    }
+	sleep(sleepSeconds);
 
-	sleep( sleepSeconds );
-
-	if (debug)
-    {
-		cout << "[" << _id << "] cat awake" << endl;
-		cout << flush;
-    }
+	if (debug.load()) {
+		std::cout << "[" << _id << "] cat awake" << std::endl;
+		std::cout << std::flush;
+	}
 }
 
 /**
@@ -85,28 +76,25 @@ void Cat::sleepNow()
   *
   * Status: Incomplete - Make changes as you see are necessary.
   */
-void Cat::catThread (Cat *aCat)
+void Cat::catThread(Cat *aCat, SharedState &state)
 {
 	
-	if (debug)
-    {
-		cout << "[" << aCat->getId() << "] cat is alive\n";
-		cout << flush;
-    }
+	if (state.debug.load()) {
+		std::cout << "[" << aCat->getId() << "] cat is alive\n";
+		std::cout << std::flush;
+	}
 
-	while(running)
-    {
-		aCat->sleepNow();
+	while(state.running.load()) {
+		aCat->sleepNow(state.debug);
 
 
 
 		/*
-	     * Check for too many lizards crossing
-	     */
-		if (numCrossingSago2MonkeyGrass + numCrossingMonkeyGrass2Sago > MAX_LIZARD_CROSSING)
-		{
-		  cout << "\tThe cats are happy - they have toys.\n";
-		  exit( -1 );
+		 * Check for too many lizards crossing
+		 */
+		if (state.numCrossingSago2MonkeyGrass.load() + state.numCrossingMonkeyGrass2Sago.load() > MAX_LIZARD_CROSSING) {
+			std::cout << "\tThe cats are happy - they have toys.\n";
+			exit(EXIT_FAILURE);
 		}
     }
 }

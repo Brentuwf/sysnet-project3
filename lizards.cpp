@@ -59,16 +59,6 @@ static constexpr size_t NUM_LIZARDS = 20;
  */
 static constexpr size_t NUM_CATS = 2;
 
-/*	
- * Maximum lizards crossing at once before alerting cats
- */
-static constexpr size_t MAX_LIZARD_CROSSING = 4;
-
-/*
- * Maximum seconds for a cat to sleep
- */
-static constexpr size_t MAX_CAT_SLEEP = 3;
-
 
 /*
  * Declare global variables here
@@ -146,7 +136,7 @@ int main(int argc, char **argv)
 		allLizards.at(i)->run(sharedState);
 
 	for (size_t i = 0; i < NUM_CATS; ++i) 
-		allCats.at(i)->run();
+		allCats.at(i)->run(sharedState);
 
 	/*
 	 * Now let the world run for a while
