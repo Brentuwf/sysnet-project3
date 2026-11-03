@@ -115,28 +115,27 @@ int main(int argc, char **argv)
 	/*
 	 * Create NUM_LIZARDS lizard threads
 	 */
-	std::vector<std::unique_ptr<Lizard>> allLizards;
-	for (size_t i = 0; i < NUM_LIZARDS; ++i) 
+	vector<std::unique_ptr<Lizard>> allLizards;
+	for (size_t i = 0; i < NUM_LIZARDS; ++i) {
 		allLizards.emplace_back(new Lizard(i));
+	}    
     
 
 	/*
 	 * Create NUM_CATS cat threads
 	 */
-	std::vector<std::unique_ptr<Cat>> allCats;
-	for (size_t i = 0; i < NUM_CATS; ++i) 
+	vector<std::unique_ptr<Cat>> allCats;
+	for (size_t i = 0; i < NUM_CATS; ++i) {
 		allCats.emplace_back(new Cat(i));
-	
+	}
 	 
 
 	/*
 	 * Run NUM_LIZARDS and NUM_CATS threads
 	 */
-	for (size_t i = 0; i < NUM_LIZARDS; ++i) 
-		allLizards.at(i)->run(sharedState);
-
-	for (size_t i = 0; i < NUM_CATS; ++i) 
-		allCats.at(i)->run(sharedState);
+	for (int i = 0; i < NUM_LIZARDS; i++) {
+		allLizards.at(i)->run();
+	}
 
 	/*
 	 * Now let the world run for a while
@@ -152,11 +151,6 @@ int main(int argc, char **argv)
 	/*
 	 * Wait until all threads terminate
 	 */
-	for (size_t i = 0; i < NUM_LIZARDS; ++i) 
-		allLizards.at(i)->wait();
-
-	for (size_t i = 0; i < NUM_CATS; ++i) 
-		allCats.at(i)->wait();
 
 
 
