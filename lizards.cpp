@@ -574,10 +574,15 @@ int main(int argc, char **argv)
 	 * Check for the debugging flag (-d)
 	 */
 	debug = 0;
-	if (argc > 1)
-		if (std::strncmp(argv[1], "-d", 2) == 0)
+	if (argc > 1) {
+		if (std::strncmp(argv[1], "-d", 2) == 0) {
 			debug = true;
-
+		} else {
+			std::fprintf(stderr, "Error only one argument is accepted -d for debug\n");
+		}
+	} else {
+		std::fprintf(stderr, "Error only one argument is accepted -d for debug\n");
+	}
 
 	/*
 	 * Initialize variables
