@@ -14,19 +14,15 @@
 /*                                                             */
 /***************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
-#include <string.h>
-#include <iostream>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <atomic>
 #include <thread>
 #include <mutex>
 #include <vector>
 #include <memory>
-
-
-using namespace std;
 
 /*
  * This is a stub file.  It contains very little code and what
@@ -116,7 +112,7 @@ std::atomic<bool> running;
 class Cat {
 	
 	int       _id;        // the Id of the cat
-	thread*   _catThread; // the thread simulating the cat
+	std::thread*   _catThread; // the thread simulating the cat
 	
 	public:
 		Cat (int id);
@@ -187,17 +183,13 @@ void Cat::sleepNow()
 
 	sleepSeconds = 1 + (int)(random() / (double)RAND_MAX * MAX_CAT_SLEEP);
 
-	if (debug.load()) {
-		cout << "[" << _id << "] cat sleeping for " << sleepSeconds << " seconds" << endl;
-		cout << flush;
-	}
+	if (debug.load()) 
+		std::fprintf(stdout, "[%d] cat sleeping for %d seconds\n", _id, sleepSeconds); // BA
 
 	sleep(sleepSeconds);
 
-	if (debug.load()) {
-		cout << "[" << _id << "] cat awake" << endl;
-		cout << flush;
-	}
+	if (debug.load()) 
+		std::fprintf(stdout, "[%d] cat awake\n", _id); // BA
 }
 
 /**
@@ -214,10 +206,8 @@ void Cat::sleepNow()
 void Cat::catThread(Cat *aCat)
 {
 	
-	if (debug.load()) {
-		cout << "[" << aCat->getId() << "] cat is alive\n";
-		cout << flush;
-	}
+	if (debug.load()) 
+		std::fprintf(stdout, "[%d] cat is alive\n", aCat->getId()); // BA
 
 	while(running.load()) {
 		aCat->sleepNow();
@@ -228,7 +218,7 @@ void Cat::catThread(Cat *aCat)
 		 * Check for too many lizards crossing
 		 */
 		if (numCrossingSago2MonkeyGrass.load() + numCrossingMonkeyGrass2Sago.load() > MAX_LIZARD_CROSSING) {
-			cout << "\tThe cats are happy - they have toys.\n";
+			std::fprintf(stdout, "\tThe cats are happy - they have toys.\n"); // BA
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -238,7 +228,7 @@ void Cat::catThread(Cat *aCat)
 
 class Lizard {
 	int     _id;      // the Id of the lizard
-	thread* _aLizard; // the thread simulating the lizard
+	std::thread* _aLizard; // the thread simulating the lizard
 
 	public:
 		Lizard(int id);
@@ -291,7 +281,7 @@ int Lizard::getId()
  void Lizard::run() 
  {
 	 // launch the thread to simulate the lizard's behavior
-	_aLizard = new thread(lizardThread, this); 
+	_aLizard = new std::thread(lizardThread, this); 
  }
  
  /**
@@ -318,17 +308,13 @@ void Lizard::sleepNow()
 
 	sleepSeconds = 1 + (int)(random() / (double)RAND_MAX * MAX_LIZARD_SLEEP);
 
-	if (debug.load()) {
-		cout << "[" << _id << "] sleeping for " << sleepSeconds << " seconds" << endl;
-		cout << flush;
-    	}
+	if (debug.load()) 
+		std::fprintf(stdout,"[%d] sleeping for %d seconds\n", _id, sleepSeconds); // BA
 
 	sleep(sleepSeconds);
 
-	if (debug.load()) {
-		cout << "[" << _id << "] awake" << endl;
-		cout << flush;
-	}
+	if (debug.load()) 
+		std::fprintf(stdout, "[%d] awake\n", _id); // BA
 }
 
 
@@ -344,18 +330,14 @@ void Lizard::sleepNow()
  */
 void Lizard::sago2MonkeyGrassIsSafe()
 {
-	if (debug.load()) {
-		cout << "[" << _id << "] checking  sago -> monkey grass" << endl;
-		cout << flush;
-	}
+	if (debug.load()) 
+		std::fprintf(stdout, "[%d] checking sago -> monkey grass\n", _id); // BA
 
 	
 
 
-	if (debug.load()) {
-		cout << "[" << _id << "] thinks  sago -> monkey grass  is safe" << endl;
-		cout << flush;
-	}
+	if (debug.load()) 
+		std::fprintf(stdout, "[%d] thinks sago -> monkey grass is safe\n", _id); // BA
 }
 
 
@@ -368,10 +350,8 @@ void Lizard::sago2MonkeyGrassIsSafe()
  */
 void Lizard::crossSago2MonkeyGrass()
 {
-	if (debug.load()) {
-		cout << "[" << _id << "] crossing  sago -> monkey grass" << endl;
-		cout << flush;
-	}
+	if (debug.load()) 
+		std::fprintf(stdout, "[%d] crossing sago -> monkey grass\n", _id); // BA
 
 	/*
 	 * One more crossing this way
@@ -382,9 +362,9 @@ void Lizard::crossSago2MonkeyGrass()
 	 * Check for lizards cross both ways
 	 */
 	if (numCrossingMonkeyGrass2Sago.load() && UNIDIRECTIONAL) {
-		cout << "\tCrash!  We have a pile-up on the concrete." << endl;
-		cout << "\t" << numCrossingSago2MonkeyGrass << " crossing sago -> monkey grass" << endl;
-		cout << "\t" << numCrossingMonkeyGrass2Sago << " crossing monkey grass -> sago" << endl;
+		std::fprintf(stdout, "\tCrash!  We have a pile-up on the concrete.\n"); // BA
+		std::fprintf(stdout, "\t%zu crossing sago -> monkey grass\n", numCrossingSago2MonkeyGrass.load()); // BA
+		std::fprintf(stdout, "\t%zu crossing monkey grass -> sago\n", numCrossingMonkeyGrass2Sago.load()); // BA
 		exit(EXIT_FAILURE);
 	}
 
@@ -411,10 +391,8 @@ void Lizard::madeIt2MonkeyGrass()
 	/*
 	* Whew, made it across
 	*/
-	if (debug.load()) {
-		cout << "[" << _id << "] made the  sago -> monkey grass  crossing" << endl;
-		cout << flush;
-	}
+	if (debug.load()) 
+		std::fprintf(stdout,  "[%d] made the sago -> monkey grass crossing/n", _id); // BA
 
 
 
@@ -434,20 +412,17 @@ void Lizard::eat()
 
 	eatSeconds = 1 + (int)(random() / (double)RAND_MAX * MAX_LIZARD_EAT);
 
-	if (debug.load()) {
-		cout << "[" << _id << "] eating for " << eatSeconds << " seconds" << endl;
-		cout << flush;
-	}
+	if (debug.load()) 
+		std::fprintf(stdout, "[%d] eating for %d seconds\n", _id, eatSeconds); // BA
 
 	/*
 	 * Simulate eating by blocking for a few seconds
 	 */
 	sleep(eatSeconds);
 
-	if (debug.load()) {
-		cout << "[" << _id << "] finished eating" << endl;
-		cout << flush;
-	}
+	if (debug.load()) 
+		std::fprintf(stdout, "[%d] finished eating\n", _id); // BA
+	
 }
 
 
@@ -460,19 +435,15 @@ void Lizard::eat()
  */
 void Lizard::monkeyGrass2SagoIsSafe()
 {
-	if (debug.load()) {
-		cout << "[" << _id << "] checking  monkey grass -> sago" << endl;
-		cout << flush;
-	}
+	if (debug.load()) 
+		std::fprintf(stdout, "[%d] checking monkey grass -> sago\n", _id); // BA
 
 
 
 
 
-	if (debug.load()) {
-		cout << "[" << _id << "] thinks  monkey grass -> sago  is safe" << endl;
-		cout << flush;
-	}
+	if (debug.load()) 
+		std::fprintf(stdout, "[%d] thinks monkey grass -> sago is safe\n", _id); // BA
 }
 
 
@@ -485,10 +456,8 @@ void Lizard::monkeyGrass2SagoIsSafe()
  */
 void Lizard::crossMonkeyGrass2Sago()
 {
-	if (debug.load()) {
-		cout << "[" << _id << "] crossing  monkey grass -> sago" << endl;
-		cout << flush;
-	}
+	if (debug.load()) 
+		std::fprintf(stdout, "[%d] crossing monkey grass -> sago\n", _id); // BA
 
 	/*
 	 * One more crossing this way
@@ -500,9 +469,9 @@ void Lizard::crossMonkeyGrass2Sago()
 	 * Check for lizards cross both ways
 	 */
 	if (numCrossingSago2MonkeyGrass.load() && UNIDIRECTIONAL) {
-		cout << "\tOh No!, the lizards have cats all over them." << endl;
-		cout << "\t " << numCrossingSago2MonkeyGrass << " crossing sago -> monkey grass" << endl;
-		cout << "\t " << numCrossingMonkeyGrass2Sago << " crossing monkey grass -> sago" << endl;
+		std::fprintf(stdout, "\tOh No!, the lizards have cats all over them.\n"); // BA
+		std::fprintf(stdout, "\t%zu crossing sago -> monkey grass\n", numCrossingSago2MonkeyGrass.load()); // BA
+		std::fprintf(stdout, "\t%zu crossing monkey grass -> sago\n", numCrossingMonkeyGrass2Sago.load()); // BA
 		exit(EXIT_FAILURE);
 	}
 
@@ -529,10 +498,9 @@ void Lizard::madeIt2Sago()
 	/*
 	 * Whew, made it across
 	 */
-	if (debug.load()) {
-		cout << "[" << _id << "] made the  monkey grass -> sago  crossing" << endl;
-		cout << flush;
-	}
+	if (debug.load()) 
+		std::fprintf(stdout, "[%d] made the monkey grass -> sago crossing\n", _id); // BA
+	
 }
 
 /**
@@ -548,10 +516,9 @@ void Lizard::madeIt2Sago()
   */
 void Lizard::lizardThread(Lizard *aLizard)
 {	
-	if (debug) {
-		cout << "[" << aLizard->getId() << "] lizard is alive" << endl;
-		cout << flush;
-	}
+	if (debug) 
+		std::fprintf(stdout, "[%d] lizard is alive\n", aLizard->getId()); // BA
+	
 
 	while(running.load()) {
 	/* 
@@ -608,7 +575,7 @@ int main(int argc, char **argv)
 	 */
 	debug = 0;
 	if (argc > 1)
-		if (strncmp(argv[1], "-d", 2) == 0)
+		if (std::strncmp(argv[1], "-d", 2) == 0)
 			debug = true;
 
 
@@ -638,7 +605,7 @@ int main(int argc, char **argv)
 	/*
 	 * Create NUM_LIZARDS lizard threads
 	 */
-	vector<std::unique_ptr<Lizard>> allLizards;
+	std::vector<std::unique_ptr<Lizard>> allLizards;
 	for (size_t i = 0; i < NUM_LIZARDS; ++i) 
 		allLizards.emplace_back(new Lizard(i));
     
@@ -646,7 +613,7 @@ int main(int argc, char **argv)
 	/*
 	 * Create NUM_CATS cat threads
 	 */
-	vector<std::unique_ptr<Cat>> allCats;
+	std::vector<std::unique_ptr<Cat>> allCats;
 	for (size_t i = 0; i < NUM_CATS; ++i) 
 		allCats.emplace_back(new Cat(i));
 	
