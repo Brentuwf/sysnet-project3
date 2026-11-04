@@ -126,10 +126,10 @@ class Cat {
 		void run();
 		void wait();
     
-    private:
+	private:
 		void sleepNow();
 
-        static void catThread (Cat *aCat); 
+		static void catThread (Cat *aCat); 
 };
 
 /**
@@ -189,19 +189,17 @@ void Cat::sleepNow()
 
 	sleepSeconds = 1 + (int)(random() / (double)RAND_MAX * MAX_CAT_SLEEP);
 
-	if (debug)
-    {
+	if (debug) {
 		cout << "[" << _id << "] cat sleeping for " << sleepSeconds << " seconds" << endl;
 		cout << flush;
-    }
+	}
 
-	sleep( sleepSeconds );
+	sleep(sleepSeconds);
 
-	if (debug)
-    {
+	if (debug) {
 		cout << "[" << _id << "] cat awake" << endl;
 		cout << flush;
-    }
+	}
 }
 
 /**
@@ -215,7 +213,7 @@ void Cat::sleepNow()
   *
   * Status: Incomplete - Make changes as you see are necessary.
   */
-void Cat::catThread (Cat *aCat)
+void Cat::catThread(Cat *aCat)
 {
 	
 	if (debug)
@@ -231,12 +229,11 @@ void Cat::catThread (Cat *aCat)
 
 
 		/*
-	     * Check for too many lizards crossing
-	     */
-		if (numCrossingSago2MonkeyGrass + numCrossingMonkeyGrass2Sago > MAX_LIZARD_CROSSING)
-		{
-		  cout << "\tThe cats are happy - they have toys.\n";
-		  exit( -1 );
+		 * Check for too many lizards crossing
+		 */
+		if (numCrossingSago2MonkeyGrass + numCrossingMonkeyGrass2Sago > MAX_LIZARD_CROSSING) {
+			cout << "\tThe cats are happy - they have toys.\n";
+			exit(-1);
 		}
     }
 }
@@ -250,10 +247,10 @@ class Lizard {
 	public:
 		Lizard(int id);
 		int getId();
-        void run();
-        void wait();
+		void run();
+		void wait();
 
-    private:
+	private:
 		void sago2MonkeyGrassIsSafe();
 		void crossSago2MonkeyGrass();
 		void madeIt2MonkeyGrass();
@@ -263,7 +260,7 @@ class Lizard {
 		void madeIt2Sago();
 		void sleepNow();
 
-        static void lizardThread(Lizard *aLizard);
+		static void lizardThread(Lizard *aLizard);
 	
 };
 
@@ -298,7 +295,7 @@ int Lizard::getId()
  void Lizard::run() 
  {
 	 // launch the thread to simulate the lizard's behavior
-    _aLizard = new thread ( lizardThread, this); 
+    _aLizard = new thread(lizardThread, this); 
  }
  
  /**
@@ -326,19 +323,17 @@ void Lizard::sleepNow()
 
 	sleepSeconds = 1 + (int)(random() / (double)RAND_MAX * MAX_LIZARD_SLEEP);
 
-	if (debug)
-    {
-      cout << "[" << _id << "] sleeping for " << sleepSeconds << " seconds" << endl;
-      cout << flush;
-    }
+	if (debug) {
+		cout << "[" << _id << "] sleeping for " << sleepSeconds << " seconds" << endl;
+		cout << flush;
+    	}
 
-	sleep( sleepSeconds );
+	sleep(sleepSeconds);
 
-	if (debug)
-    {
-      cout << "[" << _id << "] awake" << endl;
-      cout << flush;
-    }
+	if (debug) {
+		cout << "[" << _id << "] awake" << endl;
+		cout << flush;
+	}
 }
 
 
@@ -397,14 +392,14 @@ void Lizard::crossSago2MonkeyGrass()
 		cout << "\tCrash!  We have a pile-up on the concrete." << endl;
 		cout << "\t" << numCrossingSago2MonkeyGrass << " crossing sago -> monkey grass" << endl;
 		cout << "\t" << numCrossingMonkeyGrass2Sago << " crossing monkey grass -> sago" << endl;
-		exit( -1 );
+		exit(-1);
 	}
 
 
 	/*
 	 * It takes a while to cross, so simulate it
 	 */
-	sleep( CROSS_SECONDS );
+	sleep(CROSS_SECONDS);
 
     /*
      * That one seems to have made it
@@ -674,7 +669,7 @@ int main(int argc, char **argv)
 	/*
 	 * Now let the world run for a while
 	 */
-	sleep( WORLDEND );
+	sleep(WORLDEND);
 
 
 	/*
