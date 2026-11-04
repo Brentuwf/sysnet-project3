@@ -85,35 +85,26 @@ static constexpr size_t MAX_LIZARD_EAT = 5;
  */
 static constexpr size_t CROSS_SECONDS = 2;
 
-
-/*
- * Declare global variables here
+/* Global shared variables
+ * Please leave these variables alone.  They are  
+ * used to check the proper functioning of your   
+ * program.  They should only be used in the code 
+ * I have provided.                               
+ * Modified BA                                    
+ * size_t used none of the counts should go negative
+ * bool used due to values used in guard clauses for debug 
+ * or to stop execution
  */
-
-
-/**************************************************/
-/* Please leave these variables alone.  They are  */
-/* used to check the proper functioning of your   */
-/* program.  They should only be used in the code */
-/* I have provided.                               */
-/**************************************************/
-std::atomic<size_t> numCrossingSago2MonkeyGrass;
+std::atomic<size_t> numCrossingSago2MonkeyGrass; 
 std::atomic<size_t> numCrossingMonkeyGrass2Sago;
 std::atomic<bool> debug;
 std::atomic<bool> running;
-/**************************************************/
-
-
 
 /**
  * This class models a cat that sleep, wakes-up, checks on lizards in the driveway
  * and goes back to sleep. If the cat sees enough lizards it "plays" with them.
  */
 class Cat {
-	
-	int       _id;        // the Id of the cat
-	std::thread*   _catThread; // the thread simulating the cat
-	
 	public:
 		Cat (int id);
 		int getId();
@@ -121,8 +112,9 @@ class Cat {
 		void wait();
     
 	private:
+		int       _id;        // the Id of the cat
+		std::unique_ptr<std::thread> _catThread; // the thread simulating the cat
 		void sleepNow();
-
 		static void catThread (Cat *aCat); 
 };
 
@@ -150,22 +142,25 @@ int Cat::getId()
 /**
  * Launches a cat thread.
  * 
- * Status: Incomplete - Make changes to this code.
+ * Status: Finished BA 
  */
  void Cat::run() 
  {
 	 // launch the thread to simulate the cat's behavior	 
+	_catThread.reset(new std::thread(catThread, this)); // BA, reset used to transfer ownership of a newly created cat thread 
 	 
  }
  
  /**
   * Waits for a cat to finish running.
   *
-  * Status: Incomplete - Make changes to this code.
+  * Status: Finished BA 
   */
  void Cat::wait()
  {
 	 // wait for the thread to terminate
+	if (_catThread != nullptr) 
+		_catThread->join();
  }
  
  
@@ -227,9 +222,6 @@ void Cat::catThread(Cat *aCat)
  
 
 class Lizard {
-	int     _id;      // the Id of the lizard
-	std::thread* _aLizard; // the thread simulating the lizard
-
 	public:
 		Lizard(int id);
 		int getId();
@@ -237,6 +229,9 @@ class Lizard {
 		void wait();
 
 	private:
+		int     _id;      // the Id of the lizard
+		std::unique_ptr<std::thread> _aLizard; // the thread simulating the lizard
+				       
 		void sago2MonkeyGrassIsSafe();
 		void crossSago2MonkeyGrass();
 		void madeIt2MonkeyGrass();
@@ -245,7 +240,6 @@ class Lizard {
 		void crossMonkeyGrass2Sago();
 		void madeIt2Sago();
 		void sleepNow();
-
 		static void lizardThread(Lizard *aLizard);
 	
 };
@@ -281,7 +275,7 @@ int Lizard::getId()
  void Lizard::run() 
  {
 	 // launch the thread to simulate the lizard's behavior
-	_aLizard = new std::thread(lizardThread, this); 
+	_aLizard.reset(new std::thread(lizardThread, this)); // BA, reset used to transfer ownership of a newly created lizard thread 
  }
  
  /**
@@ -292,7 +286,7 @@ int Lizard::getId()
  void Lizard::wait()
  {
 	 // wait for the thread to terminate
-	if (_aLizard != NULL) 
+	if (_aLizard != nullptr) 
 		_aLizard->join();
  }
  
