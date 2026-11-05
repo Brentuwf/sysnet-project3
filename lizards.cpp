@@ -33,15 +33,9 @@
  */
 
 
-/*
- * Define "constant" values here
- */
+/* Define "constant" values here */
 
-/*
- * Make this 1 to check for lizards travelling in both directions
- * Leave it 0 to allow bidirectional travel
- */
-static constexpr bool UNIDIRECTIONAL = 0;
+static constexpr bool UNIDIRECTIONAL = false; /* True to check for lizards travelling in both directions, False for bidirectional travel */
 
 /*
  * Set this to the number of seconds you want the lizard world to
@@ -50,40 +44,19 @@ static constexpr bool UNIDIRECTIONAL = 0;
  */
 static constexpr size_t WORLDEND = 30;
 
-/*
- * Number of lizard threads to create
- */
-static constexpr size_t NUM_LIZARDS = 20;
+static constexpr size_t NUM_LIZARDS = 20; /* Number of lizard threads to create */
 
-/*
- * Number of cat threads to create
- */
-static constexpr size_t NUM_CATS = 2;
+static constexpr size_t NUM_CATS = 2; /* Number of cat threads to create */
 
-/*	
- * Maximum lizards crossing at once before alerting cats
- */
-static constexpr size_t MAX_LIZARD_CROSSING = 4;
+static constexpr size_t MAX_LIZARD_CROSSING = 4; /* Maximum lizards crossing at once before alerting cats */
 
-/*
- * Maximum seconds for a lizard to sleep
- */
-static constexpr size_t MAX_LIZARD_SLEEP = 3;
+static constexpr size_t MAX_LIZARD_SLEEP = 3; /* Maximum seconds for a lizard to sleep */
 
-/*
- * Maximum seconds for a cat to sleep
- */
-static constexpr size_t MAX_CAT_SLEEP = 3;
+static constexpr size_t MAX_CAT_SLEEP = 3; /* Maximum seconds for a cat to sleep */
 
-/*
- * Maximum seconds for a lizard to eat
- */
-static constexpr size_t MAX_LIZARD_EAT = 5;
+static constexpr size_t MAX_LIZARD_EAT = 5; /* Maximum seconds for a lizard to eat */
 
-/*
- * Number of seconds it takes to cross the driveway
- */
-static constexpr size_t CROSS_SECONDS = 2;
+static constexpr size_t CROSS_SECONDS = 2; /* Number of seconds it takes to cross the driveway */
 
 /* Global shared variables
  * Please leave these variables alone.  They are  
@@ -167,16 +140,11 @@ int Cat::getId()
 /**
  * Simulate a cat sleeping for a random amount of time
  *
- *
- * @return N/A
- *
  * Status: Complete - No need to change any of this code.
  */
 void Cat::sleepNow()
 {
-	int sleepSeconds;
-
-	sleepSeconds = 1 + (int)(random() / (double)RAND_MAX * MAX_CAT_SLEEP);
+	int sleepSeconds = 1 + (int)(random() / (double)RAND_MAX * MAX_CAT_SLEEP);
 
 	if (debug.load()) 
 		std::fprintf(stdout, "[%d] cat sleeping for %d seconds\n", _id, sleepSeconds); // BA
@@ -188,14 +156,11 @@ void Cat::sleepNow()
 }
 
 /**
-  *
   * This simulates a cat that is sleeping and occasionally checking on
   * the driveway on lizards.
   * 
   * @param aCat - a cat that is being run concurrently
   * 
-  * @return - N/A
-  *
   * Status: Incomplete - Make changes as you see are necessary.
   */
 void Cat::catThread(Cat *aCat)
@@ -298,9 +263,7 @@ int Lizard::getId()
  */
 void Lizard::sleepNow()
 {
-	int sleepSeconds;
-
-	sleepSeconds = 1 + (int)(random() / (double)RAND_MAX * MAX_LIZARD_SLEEP);
+	int sleepSeconds = 1 + (int)(random() / (double)RAND_MAX * MAX_LIZARD_SLEEP);
 
 	if (debug.load()) 
 		std::fprintf(stdout,"[%d] sleeping for %d seconds\n", _id, sleepSeconds); // BA
@@ -402,9 +365,7 @@ void Lizard::madeIt2MonkeyGrass()
  */
 void Lizard::eat()
 {
-	int eatSeconds;
-
-	eatSeconds = 1 + (int)(random() / (double)RAND_MAX * MAX_LIZARD_EAT);
+	int eatSeconds = 1 + (int)(random() / (double)RAND_MAX * MAX_LIZARD_EAT);
 
 	if (debug.load()) 
 		std::fprintf(stdout, "[%d] eating for %d seconds\n", _id, eatSeconds); // BA
